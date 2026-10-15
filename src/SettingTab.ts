@@ -26,6 +26,7 @@ export class SettingTab extends PluginSettingTab {
                     value = normalizePath(value);
                     this.plugin.settings.folderName = value;
                     await this.plugin.saveSettings();
+                    await this.plugin.hideFolder.refresh();
                 }));
 
         new Setting(containerEl)

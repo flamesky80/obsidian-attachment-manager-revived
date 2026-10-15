@@ -39,6 +39,51 @@ const encode = (text: string) => {
     return text.replace(reg, (character: string) => `\\${character}`);
 }
 
+const escapeCssAttr = (text: string) => {
+    return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+export const buildFolderCssSelectors = (settings: Settings): string[] => {
+    const raw = settings.folderName.trim();
+    const selectors: string[] = [];
+
+    if (raw.contains(_filename)) {
+        const parts = raw.split(_filename);
+        const prefix = parts[0];
+        const suffix = parts[1];
+
+        // 针对 Obsidian 中支持的 markdown 与 canvas 文件
+        const extensions = ['.md', '.markdown', '.canvas'];
+        for (const ext of extensions) {
+            const endStr = `${ext}${suffix}`;
+            if (prefix) {
+                selectors.push(`[data-path*="${escapeCssAttr(prefix)}"][data-path$="${escapeCssAttr(endStr)}" i]`);
+            } else {
+                selectors.push(`[data-path$="${escapeCssAttr(endStr)}" i]`);
+            }
+        }
+    } else if (raw.contains(_notename)) {
+        const parts = raw.split(_notename);
+        const prefix = parts[0];
+        const suffix = parts[1];
+
+        if (suffix && prefix) {
+            selectors.push(`[data-path*="${escapeCssAttr(prefix)}"][data-path$="${escapeCssAttr(suffix)}" i]`);
+        } else if (suffix) {
+            selectors.push(`[data-path$="${escapeCssAttr(suffix)}" i]`);
+        } else if (prefix) {
+            selectors.push(`[data-path*="/${escapeCssAttr(prefix)}" i]`, `[data-path^="${escapeCssAttr(prefix)}" i]`);
+        } else {
+            selectors.push(`[data-path]`);
+        }
+    } else {
+        // 固定文件夹名，如 attachments 或 _resources
+        selectors.push(`[data-path$="/${escapeCssAttr(raw)}" i]`, `[data-path="${escapeCssAttr(raw)}" i]`);
+    }
+
+    return selectors;
+}
+
 export const buildFolderRegExp = (settings: Settings) => {
     let reg = encode(settings.folderName);
     // 兼容 notename
@@ -47,19 +92,22 @@ export const buildFolderRegExp = (settings: Settings) => {
     return new RegExp("^" + reg + "$");
 }
 
-export const buildFolderName = (settings: Settings, fileName: string, notename: string) => {
-    // 指定当前文件所在文件夹（"./"）下指定的文件夹
-
+export const getAttachmentFolderName = (settings: Settings, fileName: string, notename: string) => {
     // 使用 filename
     if (settings.folderName.contains(_filename)) {
-        return "./" + settings.folderName.replace(_filename, fileName);
+        return settings.folderName.replace(_filename, fileName);
     }
     // 使用 notename
     if (settings.folderName.contains(_notename)) {
-        return "./" + settings.folderName.replace(_notename, notename);
+        return settings.folderName.replace(_notename, notename);
     }
     // 非 filename/notename
-    return "./" + settings.folderName;
+    return settings.folderName;
+}
+
+export const buildFolderName = (settings: Settings, fileName: string, notename: string) => {
+    // 指定当前文件所在文件夹（"./"）下指定的文件夹
+    return "./" + getAttachmentFolderName(settings, fileName, notename);
 }
 
 export const buildPastedImageName = (settings: Settings, notename: string) => {

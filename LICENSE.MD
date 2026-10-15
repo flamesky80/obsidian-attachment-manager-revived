@@ -1,5 +1,6 @@
 MIT License
 
+Copyright (c) 2026 flamesky80
 Copyright (c) 2023 chenfeicqq
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

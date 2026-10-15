@@ -1,4 +1,4 @@
-[English](https://github.com/chenfeicqq/obsidian-attachment-manager/blob/master/README.md) | [中文](https://github.com/chenfeicqq/obsidian-attachment-manager/blob/master/README_ZH.md)
+[English](https://github.com/flamesky80/obsidian-attachment-manager-revived/blob/master/README.md) | [中文](https://github.com/flamesky80/obsidian-attachment-manager-revived/blob/master/README_ZH.md)
 
 
 # 附件管理器（Attachment Manager）
@@ -21,17 +21,17 @@
 
 ## 怎么使用
 
-### 从插件市场安装
+### 从插件市场安装了原版
 
-* 社区插件市场中搜索 **Attachment Manager**
-* 安装并启用插件
+1. 无需卸载原版。
+2. 只需按照手工安装的流程，覆盖安装即可，之前的配置都会被保留。
 
 ### 手工安装
 
-1. 从 [Git releases](https://github.com/chenfeicqq/obsidian-attachment-manager/releases) 下载 `main.js`, `styles.css`, `manifest.json` 文件。
-2. 到笔记仓库的插件目录（`笔记仓库目录/.obsidian/plugins`）下创建插件目录 `obsidian-attachment-manager`。
-3. 复制 `main.js`, `styles.css`, `manifest.json` 到插件文件夹 `obsidian-attachment-manager`。
-4. 在 Obsidian 设置中，启用插件。
+1. 从 [Git releases](https://github.com/flamesky80/obsidian-attachment-manager-revived/releases) 下载 `main.js`, `styles.css`, `manifest.json` 文件。
+2. 到笔记仓库的插件目录（`笔记仓库目录/.obsidian/plugins`）下创建插件目录 `attachment-manager`。
+3. 复制 `main.js`, `styles.css`, `manifest.json` 到插件文件夹 `attachment-manager`。
+4. 重启 Obsidian ，进入设置中，启用插件。
 
 ## 插件截图
 

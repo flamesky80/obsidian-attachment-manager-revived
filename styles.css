@@ -1,8 +1,18 @@
-.nav-folder.aero-attachment-folder{
-    opacity: 0.2;
+/* ==========================================================================
+   Attachment Manager: 侧边栏附件文件夹显示控制与虚拟列表留白修复
+   ========================================================================== */
+
+/* 1. 覆盖 Obsidian 虚拟列表为子项计算并注入的内联 min-height，
+      强制父容器高度随可见内容自适应收缩，根治 Border 等主题下的留白与下垂导轨线问题 */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children {
+    min-height: 0 !important;
 }
-.nav-folder.hide-attachment-folder,
-.nav-folder.hide-attachment-folder *{
-    visibility: hidden;
-    height: 0 !important;
+
+/* 2. 兼容 class 形式的样式控制（采用 display: none 脱离文档流，杜绝占位留白） */
+.workspace-leaf-content[data-type="file-explorer"] .tree-item.hide-attachment-folder {
+    display: none !important;
+}
+
+.workspace-leaf-content[data-type="file-explorer"] .tree-item.aero-attachment-folder {
+    opacity: 0.2;
 }

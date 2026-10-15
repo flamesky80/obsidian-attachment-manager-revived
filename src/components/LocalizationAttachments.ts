@@ -1,10 +1,9 @@
 import { moment, FileManager, FileSystemAdapter, Notice, TFile, TextFileView, Vault, Workspace, normalizePath, requestUrl } from "obsidian";
 import * as Path from "path/posix";
 
-
 import { Plugin } from '../Plugin'
 import { lang } from '../lang'
-import { buildFolderName, buildPastedImageNameWithMoment } from "../Settings";
+import { buildFolderName, buildPastedImageNameWithMoment, getAttachmentFolderName } from "../Settings";
 
 // https://developer.mozilla.org/zh-CN/docs/Web/Media/Formats/Image_types
 const IMAGE_EXTENSION: Record<string, string> = {
@@ -42,22 +41,6 @@ export class LocalizationAttachments {
     }
 
     load() {
-        // 添加文件菜单
-        /* this.plugin.registerEvent(this.workspace.on("file-menu", (menu, file) => {
-            if (!(file instanceof TFile)) {
-                return;
-            }
-            // `md` file
-            if (file.extension === 'md') {
-                return;
-            }
-            menu.addItem((menuItem: MenuItem) => {
-                menuItem.setTitle(lang.get("command_localization_remote_attachments"));
-                menuItem.onClick(() => {
-
-                })
-            });
-        })); */
         // This adds a command that can be triggered anywhere
         this.plugin.addCommand({
             id: "localization-remote-attachments",
@@ -112,16 +95,16 @@ export class LocalizationAttachments {
         content.replace(regex, (match: string, anchor: string, link: string) => {
             // 时间种子 +1 ms，避免 content 中存在多个图片链接时，相同时间的图片名称相同，会导致保存失败
             // https://github.com/chenfeicqq/obsidian-attachment-manager/issues/8
-            timeseed = timeseed.add(1, 'm');
+            timeseed = timeseed.add(1, 'ms');
+            const cleanLink = link.trim().replace(/^<|>$/g, "");
             const imagePath = Path.join(folderPath, buildPastedImageNameWithMoment(this.plugin.settings, timeseed, activeFile.basename));
-            promises.push(this._download4MD(activeFile, match, link, imagePath));
+            promises.push(this._download4MD(activeFile, match, anchor, cleanLink, imagePath));
             return match;
         });
 
         const list = await Promise.all(promises);
 
         // 替换为下载后的链接
-        // const newContent = content.replace(regex, () => list.shift());
         const newContent = content.replace(regex, (match: string) => {
             const newLink = list.shift();
             return newLink ? newLink : match;
@@ -132,7 +115,7 @@ export class LocalizationAttachments {
         }
     }
 
-    async _download4MD(activeFile: TFile, match: string, link: string, imagePath: string) {
+    async _download4MD(activeFile: TFile, match: string, anchor: string, link: string, imagePath: string) {
         // 不是远程文件
         if (!this._isUrl(link)) {
             return match;
@@ -142,7 +125,8 @@ export class LocalizationAttachments {
         if (!(file instanceof TFile)) {
             return match;
         }
-        return this.fileManager.generateMarkdownLink(file, activeFile.path);
+        const dirName = getAttachmentFolderName(this.plugin.settings, activeFile.name, activeFile.basename);
+        return `![${anchor || ""}](<${dirName}/${file.name}>)`;
     }
 
     async _process4Canvas(activeView: TextFileView, activeFile: TFile, folderPath: string) {
@@ -157,7 +141,7 @@ export class LocalizationAttachments {
         content.nodes.forEach((node: Node) => {
             // 时间种子 +1 ms，避免 content 中存在多个图片链接时，相同时间的图片名称相同，会导致保存失败
             // https://github.com/chenfeicqq/obsidian-attachment-manager/issues/8
-            timeseed = timeseed.add(1, 'm');
+            timeseed = timeseed.add(1, 'ms');
             const imagePath = Path.join(folderPath, buildPastedImageNameWithMoment(this.plugin.settings, timeseed, activeFile.basename));
             promises.push(this._download4Canvas(node, imagePath));
         });
@@ -200,8 +184,19 @@ export class LocalizationAttachments {
                 new Notice(`${url} ${lang.get("command_localization_remote_attachments_failure")}`);
                 return false;
             }
-            const contentType = response.headers['content-type'];
-            const extension = IMAGE_EXTENSION[contentType];
+            const rawContentType = response.headers['content-type'] || "";
+            const mimeType = rawContentType.split(";")[0].trim().toLowerCase();
+            let extension = IMAGE_EXTENSION[mimeType];
+
+            if (!extension) {
+                try {
+                    const urlObj = new URL(url);
+                    const extFromUrl = Path.extname(urlObj.pathname).replace(".", "").toLowerCase();
+                    if (Object.values(IMAGE_EXTENSION).includes(extFromUrl)) {
+                        extension = extFromUrl;
+                    }
+                } catch (_) {}
+            }
 
             if (!extension) {
                 // 非图片跳过

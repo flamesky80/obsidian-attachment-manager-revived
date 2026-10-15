@@ -1,4 +1,4 @@
-[English](https://github.com/chenfeicqq/obsidian-attachment-manager/blob/master/README.md) | [中文](https://github.com/chenfeicqq/obsidian-attachment-manager/blob/master/README_ZH.md)
+[English](https://github.com/flamesky80/obsidian-attachment-manager-revived/blob/master/README.md) | [中文](https://github.com/flamesky80/obsidian-attachment-manager-revived/blob/master/README_ZH.md)
 
 # Attachment Manager
 
@@ -21,16 +21,16 @@ Attachment Manager: Attachment folder name binding note name, automatically rena
 
 ## How to use
 
-### Plugin Manager
+### For users who installed from community plugins
 
-* Install via the Community plugins setting. Search for **Attachment Manager**.
-* Activate the plugin in the settings.
+1. No need to uninstall original plugin.
+2. Follow the manual installation steps, and all settings will be kept.
 
 ### Manual Install
 
-1. Download `main.js`, `styles.css`, `manifest.json` in the [Git releases](https://github.com/chenfeicqq/obsidian-attachment-manager/releases).
-2. Create the plugin directory `obsidian-attachment-manager` in the vault plugins directory `VaultFolder/.obsidian/plugins`.
-3. Copy `main.js`, `styles.css`, `manifest.json` to `obsidian-attachment-manager` directory.
+1. Download `main.js`, `styles.css`, `manifest.json` in the [Git releases](https://github.com/flamesky80/obsidian-attachment-manager-revived/releases).
+2. Create the plugin directory `attachment-manager` in the vault plugins directory `VaultFolder/.obsidian/plugins`.
+3. Copy `main.js`, `styles.css`, `manifest.json` to `attachment-manager` directory.
 4. Enable plugin in Obsidian setting.
 
 ## Screenshots
